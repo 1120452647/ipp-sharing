@@ -9,9 +9,6 @@ default = ["pdfium"]
 winpdf = []
 pdfium = ["winprint/pdfium"]
 
-[patch.crates-io]
-bonjour-sys = { path = "../bonjour-sys" }
-
 [dependencies]
 anyhow = "1.0"
 bimap = "0.6"

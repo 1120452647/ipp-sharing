@@ -1,0 +1,30 @@
+name: Build Rust Project
+
+on:
+  push:  # 每次推送代码到仓库时自动触发构建
+    branches: [ main ]  # 可改为其他分支，如 master
+  workflow_dispatch:  # 允许手动触发构建
+
+jobs:
+  build:
+    runs-on: windows-latest  # 使用 Windows 运行器
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: x86_64-pc-windows-msvc  # 指定 Windows 目标平台
+        override: true
+
+    - name: Build Release
+      run: cargo build --release --target x86_64-pc-windows-msvc
+
+    - name: Upload EXE as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-exe  # 自定义构建产物名称
+        path: target/x86_64-pc-windows-msvc/release/ipp-sharing.exe  # 替换为你的项目名

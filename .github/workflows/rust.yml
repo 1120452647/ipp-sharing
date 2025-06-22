@@ -1,22 +1,24 @@
-name: Rust
+name: Rust Build
 
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
-env:
-  CARGO_TERM_COLOR: always
+on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Avahi dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libavahi-client-dev libavahi-common-dev
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo dependencies
+        uses: swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --verbose

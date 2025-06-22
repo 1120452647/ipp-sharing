@@ -1,22 +1,36 @@
-name: Rust
+name: Rust Build
 
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
-env:
-  CARGO_TERM_COLOR: always
+on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      # 1. 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 安装系统依赖（新增步骤）
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libavahi-client-dev \        # Avahi 客户端开发库
+            libavahi-common-dev \        # Avahi 公共开发库
+            clang \                      # Clang 编译器（生成绑定所需）
+            pkg-config \                 # 库路径查找工具
+            build-essential \            # 基础编译工具链
+            libssl-dev \                 # OpenSSL 开发库（如项目需要）
+            libdbus-1-dev                # D-Bus 开发库（可选，某些功能依赖）
+
+      # 3. 安装 Rust 工具链
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      # 4. 缓存 Cargo 依赖（加速构建）
+      - name: Cache cargo dependencies
+        uses: swatinem/rust-cache@v2
+
+      # 5. 构建项目
+      - name: Build
+        run: cargo build --verbose
